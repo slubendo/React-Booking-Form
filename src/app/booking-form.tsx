@@ -4,10 +4,11 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import UserDetails from "./user-details";
 
-export default function AppointmentForm({
-  children
-}: {
+import { createBooking } from "./actions";
 
+export default function AppointmentForm({
+  children,
+}: {
   children?: React.ReactNode;
 }) {
   const [date, setDate] = useState("");
@@ -18,7 +19,12 @@ export default function AppointmentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ date, name, email });
+    // console.log({ date, name, email });
+    const result = await createBooking(date, name, email)
+    if (result?.error) {
+      alert(result.error)
+    }
+    // send to server and save in database
     setDate("");
     setName("");
     setEmail("");
