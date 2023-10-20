@@ -7,6 +7,13 @@ import BookingForm from "./booking-form";
 
 import UserDetails from "./user-details";
 
+import Bookings from "./bookings";
+import LoadingBookings from "./loading-bookings";
+import { Suspense } from "react";
+
+// Opt out of caching for all data requests in the route segment
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   const user = {
     username: "mo",
@@ -15,10 +22,15 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-white flex items-center justify-center h-screen">
+    <main className="bg-white max-w-xl m-auto ">
       <BookingForm>
         <UserDetails user={user} />
       </BookingForm>
+
+      <Suspense fallback={<LoadingBookings />}>
+        <Bookings />
+      </Suspense>
+      
     </main>
   );
 }
