@@ -18,6 +18,3 @@ export default function UserDetails({user}: {user: {avatar: string, username: st
   );
 }
 
-export function whatever() {
-
-}

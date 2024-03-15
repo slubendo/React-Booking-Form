@@ -5,29 +5,37 @@ import { useState } from "react";
 import UserDetails from "./user-details";
 
 import { createBooking } from "./actions";
+import LoadingBookings from "./loading-bookings";
+import Bookings from "./bookings";
 
-export default function AppointmentForm({
-  children,
-}: {
-  children?: React.ReactNode;
-}) {
+export default function AppointmentForm() {
   const [date, setDate] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const buttonDisabled = !date || !name || !email;
+  const buttonDisabled = !date || !description || !amount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // console.log({ date, name, email });
-    const result = await createBooking(date, name, email)
+    if(loading) {
+      setLoading(true);
+      setSuccessMsg("");
+    }
+
+
+    const result = await createBooking(date, description, amount)
+    setLoading(false);
+    setSuccessMsg("Expense added");
+
     if (result?.error) {
       alert(result.error)
     }
     // send to server and save in database
     setDate("");
-    setName("");
-    setEmail("");
+    setDescription("");
+    setAmount(0);
   };
 
   return (
@@ -35,17 +43,11 @@ export default function AppointmentForm({
       onSubmit={handleSubmit}
       className="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-3xl"
     >
-      {children}
-      {/* <UserDetails user={user} /> */}
-      <div className="flex flex-col space-y-1.5 p-6">
+
         <h3 className="text-2xl font-semibold leading-none tracking-tight">
-          Book Your Appointment
+          Expense tracker
         </h3>
-        <p className="text-sm text-muted-foreground">
-          Select a date and time, then fill out your details.
-        </p>
-      </div>
-      <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6">
         <div className="space-y-2">
           <label
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -67,17 +69,17 @@ export default function AppointmentForm({
         <div className="space-y-2">
           <label
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            htmlFor="name"
+            htmlFor="description"
           >
-            Your name
+            Description
           </label>
           <input
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            id="name"
-            placeholder="Enter your name"
+            id="description"
+            placeholder="Expense Description"
             required
-            onChange={(e) => setName(e.target.value)}
-            value={name}
+            onChange={(e) => setDescription(e.target.value)}
+            value={description}
             type="text"
           />
         </div>
@@ -86,16 +88,16 @@ export default function AppointmentForm({
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             htmlFor="email"
           >
-            Email
+            Amount
           </label>
           <input
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            id="email"
-            placeholder="m@example.com"
+            id="amount"
+            placeholder="Amount Spent"
             required
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
+            type="number"
+            onChange={(e) => setAmount(+e.target.value)}
+            value={amount}
           />
         </div>
         <button
@@ -110,6 +112,8 @@ export default function AppointmentForm({
           Confirm Booking
         </button>
       </div>
-    </form>
+{loading ? (<LoadingBookings></LoadingBookings>) : (<Bookings></Bookings>)}
+</form>
+  
   );
 }
